@@ -1,6 +1,30 @@
 import random
+from datetime import datetime
 
 MOVES = ["камень", "ножницы", "бумага"]
+
+
+class ScoreBoard:
+    def __init__(self):
+        self.player_wins = 0
+        self.pc_wins = 0
+        self.draws = 0
+
+    def update(self, result):
+        if result == "player":
+            self.player_wins += 1
+        elif result == "pc":
+            self.pc_wins += 1
+        else:
+            self.draws += 1
+
+    def display(self):
+        print(f"Счет: Игрок {self.player_wins} - ПК {self.pc_wins} (Ничьи: {self.draws})")
+
+    def save_to_file(self, filename="scores.txt"):
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(filename, "a", encoding="utf-8") as f:
+            f.write(f"{now} | player={self.player_wins} pc={self.pc_wins} draws={self.draws}\n")
 
 
 def computer_choice():
@@ -40,8 +64,7 @@ def determine_winner(player_move, cpu_move):
 
 
 def main():
-    score_player = 0
-    score_pc = 0
+    score = ScoreBoard()
 
     print("\nИгра Камень ножницы бумага")
     print("\nИгра до 5 побед, попробуете победить компьютер?")
@@ -50,6 +73,9 @@ def main():
         player_move = user_choice()
         if player_move is None:
             print("Игра завершена.")
+            score.display()
+            score.save_to_file()
+            print("Результат сохранен в scores.txt")
             break
 
         cpu_move = computer_choice()
@@ -62,16 +88,18 @@ def main():
         if result == "draw":
             print("Ничья!")
         elif result == "player":
-            score_player += 1
             print("Ты победил!")
         else:
-            score_pc += 1
             print("Победил компьютер!")
 
-        print(f"Счет: Игрок {score_player} - ПК {score_pc}")
+        score.update(result)
+        score.display()
 
-        if score_player == 5 or score_pc == 5:
+        if score.player_wins == 5 or score.pc_wins == 5:
             print("Игра завершена")
+            score.display()
+            score.save_to_file()
+            print("Результат сохранен в scores.txt")
             break
 
 
